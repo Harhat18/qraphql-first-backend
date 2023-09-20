@@ -1,66 +1,88 @@
-const { ApolloServer, gql } = require('apollo-server');
-const { ApolloServerPluginLandingPageGraphQLPlayground} = require('apollo-server-core');
-const { authors, books} = require ('./data.js')
-
+const { ApolloServer, gql } = require("apollo-server");
+const {
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} = require("apollo-server-core");
+const { users, posts, comments } = require("./data");
 
 const typeDefs = gql`
-  type Author {
+  type User {
     id: ID!
-    name: String!
-    surname: String!
-    age: Int
-    books(filter: String): [Book!]
+    fullname: String!
+    posts: [Post!]!
+    comments: [Comment!]!
   }
 
-  type Book {
+  type Post {
     id: ID!
     title: String!
-    author: Author
-    author_id: String!
-    score: Float
-    isPublished: Boolean!
+    user_id: ID!
+    user: User!
+    comments: [Comment!]!
+  }
+
+  type Comment {
+    id: ID!
+    text: String!
+    post_id: ID!
+    user: User!
+    post: Post!
   }
 
   type Query {
-    books: [Book!]
-    book(id: ID!) : Book! 
+    users: [User!]!
+    user(id: ID!): User!
 
-    authors: [Author!]
-    author(id: ID!) : Author!
+    posts: [Post!]!
+    post(id: ID!): Post!
+
+    comments: [Comment!]!
+    comment(id: ID!): Comment!
   }
 `;
 
 const resolvers = {
   Query: {
-    books: () => books,
-    book: (parent, args) => books.find( book => book.id === args.id),
+    //Get All Users
+    users: () => users,
 
-    authors : () => authors,
-    author: (parent, args) => authors.find( author => author.id === args.id),
-  },
+    //Get Single User by ID
+    user: (parent, args) => {
+      const user = users.find((user) => user.id === args.id);
 
-  Book: {
-    author: (parent) => authors.find(author => author.id == parent.author_id),
-  },
-  
-  Author: {
-    books: (parent, args) =>  books.filter (book =>  {
-      let filtered = book.author_id === parent.id && book.title.startsWith( args.filter || "");
-
-      if(args.filter){
-        filtered = book.author_id === parent.id && book.title.toLowerCase().startsWith( args.filter.toLowerCase() || "" );
+      if (!user) {
+        throw "User not found";
       }
-      return filtered
-    }),
+
+      return user;
+    },
+    posts: () => posts,
+    post: (parent, args) => posts.find((post) => post.id === args.id),
+
+    comments: () => comments,
+    comment: (parent, args) =>
+      comments.find((comment) => comment.id === args.id),
+  },
+
+  User: {
+    posts: (parent, args) => posts.filter((post) => post.user_id === parent.id),
+    comments: (parent, args) =>
+      comments.filter((comment) => comment.user_id === parent.id),
+  },
+  Post: {
+    user: (parent, args) => users.find((user) => user.id === parent.user_id),
+    comments: (parent) =>
+      comments.filter((comment) => comment.post_id === parent.id),
+  },
+  Comment: {
+    user: (parent, args) => users.find((user) => user.id === parent.user_id),
+    post: (parent, args) => posts.find((post) => post.id === parent.post_id),
   },
 };
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+  plugins: [ApolloServerPluginLandingPageGraphQLPlayground({})],
 });
 
-server.listen().then(({ url }) => {
-  console.log('apollo server başaladı' + url);
-});
+server.listen().then(({ url }) => console.log(`Apollo server ready at ${url}`));

@@ -1,41 +1,22 @@
-const authors = [
-  {
-    id: '1',
-    name: 'Albert',
-    surname: 'Camus',
-    age: '50',
-  },
-  {
-    id: '2',
-    name: 'George',
-    surname: 'Orwell',
-    age: '45'
-  },
+const users = [
+  { id: "1", fullname: "Buket Soyhan" },
+  { id: "2", fullname: "Asli Demirci" },
 ];
 
-const books = [
-  {
-    id: '1',
-    title: 'Yabancı',
-    author_id: '1',
-    score: 7.3,
-    isPublished: true,
-  },
-  {
-    id: '2',
-    title: 'Albert C. Kitap',
-    author_id: '1',
-    score: 2.4,
-    isPublished: true,
-  },
-  {
-    id: '3',
-    title: 'Hayvan çiftiliği',
-    author_id: '2',
-    score: 7.3,
-    isPublished: true,
-  },
+const posts = [
+  { id: "1", title: "Buketin gönderisi", user_id: "1" },
+  { id: "2", title: "Aslinin gönderisi", user_id: "1" },
+  { id: "3", title: "Aslinin gönderisi", user_id: "2" },
 ];
 
+const comments = [
+  { id: "1", text: "Lorem Ipsum", post_id: "1", user_id: "1" },
+  { id: "2", text: "foo bar", post_id: "1", user_id: "2" },
+  { id: "3", text: "foo var baz", post_id: "2", user_id: "1" },
+];
 
-module.exports = { authors, books }
+module.exports = {
+  users,
+  posts,
+  comments,
+};
